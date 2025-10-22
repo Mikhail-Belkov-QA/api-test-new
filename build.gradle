@@ -1,0 +1,100 @@
+plugins {
+    id 'java'
+    id "io.freefair.lombok" version "8.4"
+    id("io.qameta.allure") version "2.11.2"
+    id "org.openapi.generator" version "6.6.0"
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    testImplementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.4.0'
+    testImplementation group: 'io.qameta.allure', name: 'allure-rest-assured', version: '2.20.1'
+    testImplementation group: 'org.aeonbits.owner', name: 'owner', version: '1.0.12'
+    testImplementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    implementation group: 'com.github.javafaker', name: 'javafaker', version: '1.0.2'
+    testImplementation group: 'org.awaitility', name: 'awaitility', version: '4.2.0'
+    testImplementation('com.codeborne:selenide:7.9.0')
+    testImplementation ('io.qameta.allure:allure-selenide:2.21.0')
+
+    implementation 'com.google.code.gson:gson:2.13.1'
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperties(System.getProperties())
+}
+
+task old_test(type: Test) {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperties(System.getProperties())
+    useJUnitPlatform() {
+        includeTags("OldTests")
+    }
+}
+
+task misha_test(type: Test) {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperties(System.getProperties())
+    useJUnitPlatform() {
+        includeTags("MishaTests")
+    }
+}
+
+task all_web_test(type: Test) {
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperties(System.getProperties())
+    useJUnitPlatform() {
+        includeTags("AllWeb")
+    }
+}
+
+openApiGenerate {
+    generatorName = "java" // Укажите язык (java)
+    inputSpec = "$projectDir/src/main/resources/openapi.yaml" // Путь к вашему OpenAPI YAML или JSON файлу
+    outputDir = "$buildDir/generated" // Папка для сгенерированного кода
+    apiPackage = "com.example.api" // Пакет для API
+    modelPackage = "com.example.model" // Пакет для моделей
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', "$buildDir/generated/src/main/java"]
+        }
+    }
+}
+
+tasks.register("myTags", Test.class){
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    String fullTags = System.getProperty("customTags")
+    if (fullTags != null){
+        String[] tags = fullTags.split(",")
+        useJUnitPlatform(){
+            for(String tag: tags){
+                includeTags.add(tag)
+            }
+        }
+    }
+}
