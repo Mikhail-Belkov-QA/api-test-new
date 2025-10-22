@@ -6,12 +6,7 @@ import static api.helper.RequestHelper.getDefaultRequestSpec;
 
 public class ServiceManager {
 
-    // Не очень хороший сервис, пояснения внутри
-    public static UserService getUserService(){
-        return new UserService();
-    }
 
-    // Хороший сервис, пояснения внутри
     public static UserServiceMisha getUserServiceMisha(){
         return new UserServiceMisha(getDefaultRequestSpec());
     }
