@@ -122,7 +122,6 @@ public class UserNewTestsMisha {
                 .asToken();
         getUserServiceMisha().getUserInfo(token)
                 .should(Conditions.hasStatusCode(200))
-                //отсебятинская проверка
                 .should(Conditions.hasNoEmptyValues());
     }
 
